@@ -3,6 +3,7 @@ package com.rosklyar.cards.domain;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
@@ -19,6 +20,13 @@ public class Album {
         this.id = id;
         this.name = name;
         this.sets = sets;
+    }
+
+    public Album getEmptyAlbum(){
+
+        Set<AlbumSet> emptySets = newHashSet();
+        sets.forEach(set -> emptySets.add(set.getEmptyCopy()));
+        return new Album(id, name, emptySets);
     }
 
     @Override

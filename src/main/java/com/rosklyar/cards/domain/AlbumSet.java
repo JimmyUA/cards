@@ -3,6 +3,7 @@ package com.rosklyar.cards.domain;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
@@ -19,6 +20,10 @@ public class AlbumSet {
         this.id = id;
         this.name = name;
         this.cards = cards;
+    }
+
+    public AlbumSet getEmptyCopy(){
+        return new AlbumSet(id, name, newHashSet());
     }
 
     @Override
@@ -39,5 +44,9 @@ public class AlbumSet {
     @Override
     public String toString() {
         return reflectionToString(this, SHORT_PREFIX_STYLE);
+    }
+
+    public boolean containsCard(long cardId) {
+        return cards.stream().anyMatch(card -> card.id == cardId);
     }
 }
