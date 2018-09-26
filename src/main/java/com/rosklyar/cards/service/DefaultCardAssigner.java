@@ -1,8 +1,9 @@
 package com.rosklyar.cards.service;
 
-import com.rosklyar.cards.AlbumChecker;
 import com.rosklyar.cards.DefaultConfiguration;
-import com.rosklyar.cards.domain.*;
+import com.rosklyar.cards.domain.Album;
+import com.rosklyar.cards.domain.Event;
+import com.rosklyar.cards.domain.User;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -26,31 +27,14 @@ public class DefaultCardAssigner implements CardAssigner {
 
     @Override
     public void assignCard(long userId, long cardId) {
+
         User currentUser = users.stream()
                 .filter(user -> user.getId() == userId).findFirst()
                 .orElse(addUser(userId));
 
-        AlbumSet currentCardSet = sampleAlbum.sets.stream()
-                .filter(set -> set.containsCard(cardId)).findFirst()
-                .orElseThrow(RuntimeException::new);
+        Set<Event> events = currentUser.offerCard(cardId);
 
-        Card currentCard = currentCardSet.cards.stream()
-                .filter(card -> card.id == cardId).findFirst()
-                .orElseThrow(RuntimeException::new);
-
-        long cardSetId = currentCardSet.id;
-
-        boolean isCardTaken = currentUser.offerCard(currentCard, cardSetId);
-        if (isCardTaken){
-            boolean isSetFull = AlbumChecker.checkIfSetFull(currentUser, cardSetId);
-            boolean isAlbumFull = AlbumChecker.checkIfAlbumFull(currentUser);
-            if (isSetFull){
-                consumer.accept(new Event(userId, Event.Type.SET_FINISHED));
-            }
-            if (isAlbumFull){
-                consumer.accept(new Event(userId, Event.Type.ALBUM_FINISHED));
-            }
-        }
+        events.forEach(event -> consumer.accept(event));
     }
 
     @Override
@@ -58,7 +42,7 @@ public class DefaultCardAssigner implements CardAssigner {
         this.consumer = consumer;
     }
 
-    private User addUser(long userId){
+    private User addUser(long userId) {
         Album emptySetsAlbum = getEmptySetsAlbum(sampleAlbum);
         final User user = new User(userId, emptySetsAlbum);
         users.add(user);

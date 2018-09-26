@@ -66,6 +66,7 @@ public class CardAssignerTest {
         assert events.stream().filter(event -> event.type == SET_FINISHED).count() == users.size() * album.sets.size();
     }
 
+
     private boolean albumsFinished(List<Event> events, Album album) {
         return events.size() == users.size() + users.size() * album.sets.size();
     }
