@@ -2,7 +2,7 @@ package com.rosklyar.cards.domain;
 
 public class User {
     private long id;
-    private Album album;
+    public Album album;
 
     public User(long id, Album album) {
         this.id = id;

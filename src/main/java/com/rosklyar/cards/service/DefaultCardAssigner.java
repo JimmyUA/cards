@@ -1,5 +1,6 @@
 package com.rosklyar.cards.service;
 
+import com.rosklyar.cards.AlbumChecker;
 import com.rosklyar.cards.DefaultConfiguration;
 import com.rosklyar.cards.domain.*;
 
@@ -40,6 +41,16 @@ public class DefaultCardAssigner implements CardAssigner {
         long cardSetId = currentCardSet.id;
 
         boolean isCardTaken = currentUser.offerCard(currentCard, cardSetId);
+        if (isCardTaken){
+            boolean isSetFull = AlbumChecker.checkIfSetFull(currentUser, cardSetId);
+            boolean isAlbumFull = AlbumChecker.checkIfAlbumFull(currentUser);
+            if (isSetFull){
+                consumer.accept(new Event(userId, Event.Type.SET_FINISHED));
+            }
+            if (isAlbumFull){
+                consumer.accept(new Event(userId, Event.Type.ALBUM_FINISHED));
+            }
+        }
     }
 
     @Override
@@ -49,7 +60,9 @@ public class DefaultCardAssigner implements CardAssigner {
 
     private User addUser(long userId){
         Album emptySetsAlbum = getEmptySetsAlbum(sampleAlbum);
-        return new User(userId, emptySetsAlbum);
+        final User user = new User(userId, emptySetsAlbum);
+        users.add(user);
+        return user;
     }
 
     private Album getEmptySetsAlbum(Album album) {
